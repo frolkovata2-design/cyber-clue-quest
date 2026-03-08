@@ -1,11 +1,13 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link2, CheckCircle, XCircle, FileText, Terminal, Mail, File, Eye, ArrowRight } from 'lucide-react';
+import { Link2, CheckCircle, XCircle, FileText, Terminal, Mail, File, Eye, ArrowRight, ArrowLeft } from 'lucide-react';
 import { SAMPLE_EVIDENCE, EVIDENCE_MATCHES } from '@/data/gameContent';
 import { SFX } from '@/lib/sfx';
 
 interface EvidenceBoardProps {
   foundEvidence: string[];
+  moduleId?: string;
   onComplete: () => void;
 }
 
@@ -17,15 +19,35 @@ const typeIcons: Record<string, any> = {
   file: File,
 };
 
-const EvidenceBoard = ({ foundEvidence, onComplete }: EvidenceBoardProps) => {
+const EvidenceBoard = ({ foundEvidence, moduleId = 'module_1', onComplete }: EvidenceBoardProps) => {
+  const navigate = useNavigate();
+  
+  // Filter matches for current module
+  const modulePrefix = moduleId === 'module_1' ? 'match_' : moduleId === 'module_2' ? 'match_m2_' : 'match_m3_';
+  const moduleMatches = EVIDENCE_MATCHES.filter(m => {
+    if (moduleId === 'module_1') return m.id.startsWith('match_') && !m.id.startsWith('match_m');
+    return m.id.startsWith(modulePrefix);
+  });
+
   const [currentMatch, setCurrentMatch] = useState(0);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
   const [matchResults, setMatchResults] = useState<Record<string, boolean>>({});
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
-  const match = EVIDENCE_MATCHES[currentMatch];
+  const match = moduleMatches[currentMatch];
   const availableEvidence = foundEvidence.map(id => SAMPLE_EVIDENCE.find(e => e.id === id)).filter(Boolean);
+
+  if (!match) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground mb-4">Нет данных для сопоставления</p>
+          <button onClick={() => navigate('/game')} className="text-primary hover:underline">Назад к модулям</button>
+        </div>
+      </div>
+    );
+  }
 
   const toggleCard = (evId: string) => {
     if (showResult) return;
@@ -47,7 +69,7 @@ const EvidenceBoard = ({ foundEvidence, onComplete }: EvidenceBoardProps) => {
   const handleNext = () => {
     setSelectedCards([]);
     setShowResult(false);
-    if (currentMatch < EVIDENCE_MATCHES.length - 1) {
+    if (currentMatch < moduleMatches.length - 1) {
       setCurrentMatch(prev => prev + 1);
       SFX.transition();
     } else {
@@ -56,19 +78,25 @@ const EvidenceBoard = ({ foundEvidence, onComplete }: EvidenceBoardProps) => {
     }
   };
 
-  const correctCount = Object.values(matchResults).filter(Boolean).length;
-
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="border-b border-border bg-card/80 backdrop-blur-lg px-4 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate('/game')}
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Назад
+            </button>
+            <div className="w-px h-5 bg-border" />
             <Link2 className="w-4 h-4 text-primary" />
             <span className="text-sm font-medium text-foreground">Сопоставление улик</span>
           </div>
           <span className="text-xs font-mono text-muted-foreground">
-            {currentMatch + 1}/{EVIDENCE_MATCHES.length}
+            {currentMatch + 1}/{moduleMatches.length}
           </span>
         </div>
       </header>
@@ -77,7 +105,7 @@ const EvidenceBoard = ({ foundEvidence, onComplete }: EvidenceBoardProps) => {
       <div className="max-w-4xl mx-auto w-full px-4 pt-4">
         <div className="h-1 bg-secondary rounded-full overflow-hidden">
           <motion.div className="h-full bg-primary rounded-full"
-            animate={{ width: `${((currentMatch + (showResult ? 1 : 0)) / EVIDENCE_MATCHES.length) * 100}%` }}
+            animate={{ width: `${((currentMatch + (showResult ? 1 : 0)) / moduleMatches.length) * 100}%` }}
           />
         </div>
       </div>
@@ -159,14 +187,14 @@ const EvidenceBoard = ({ foundEvidence, onComplete }: EvidenceBoardProps) => {
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
                 <div className={`text-center p-4 rounded-xl ${isCorrect ? 'bg-primary/10 border border-primary/30' : 'bg-destructive/10 border border-destructive/30'}`}>
                   <p className={`text-sm font-bold ${isCorrect ? 'text-primary' : 'text-destructive'}`}>
-                    {isCorrect ? '✓ Верно! Улики сопоставлены правильно.' : '✗ Неверно. Посмотрите на правильные улики.'}
+                    {isCorrect ? '✓ Верно! Улики сопоставлены правильно.' : '✗ Неверно. Правильные улики выделены зелёным.'}
                   </p>
                 </div>
                 <div className="flex justify-center">
                   <button onClick={handleNext}
                     className="flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground font-semibold rounded-lg hover:scale-105 active:scale-95 transition-transform text-sm"
                   >
-                    {currentMatch < EVIDENCE_MATCHES.length - 1 ? 'Следующий вывод' : 'К финальному расследованию'}
+                    {currentMatch < moduleMatches.length - 1 ? 'Следующий вывод' : 'К финальному расследованию'}
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
