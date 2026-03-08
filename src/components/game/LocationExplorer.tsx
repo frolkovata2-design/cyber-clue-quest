@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, MapPin, AlertTriangle, FileText, Terminal, Mail, File, Eye, ChevronRight } from 'lucide-react';
-import { SAMPLE_EVIDENCE, SCENE_IMAGES, EASTER_EGGS } from '@/data/gameContent';
+import { SAMPLE_EVIDENCE, SCENE_IMAGES } from '@/data/gameContent';
 import { SFX } from '@/lib/sfx';
 
 interface LocationHotspot {
@@ -43,11 +43,8 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isOverScene, setIsOverScene] = useState(false);
   const [nearHotspot, setNearHotspot] = useState(false);
-  const [activeEasterEgg, setActiveEasterEgg] = useState<{ emoji: string; text: string; x: number; y: number } | null>(null);
-  const [foundEasterEggs, setFoundEasterEggs] = useState<string[]>([]);
   const sceneRef = useRef<HTMLDivElement>(null);
   const prevHoveredRef = useRef<string | null>(null);
-  const prevEggRef = useRef<string | null>(null);
 
   const loc = locations[activeLocation];
   const sceneImage = SCENE_IMAGES[loc.locationKey];
@@ -71,28 +68,7 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
       if (dist < 12) { near = true; break; }
     }
     setNearHotspot(near);
-
-    // Check easter eggs
-    const eggs = EASTER_EGGS[loc.locationKey] || [];
-    let foundEgg: typeof eggs[0] | null = null;
-    for (const egg of eggs) {
-      const dx = pctX - egg.x;
-      const dy = pctY - egg.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 8) { foundEgg = egg; break; }
-    }
-    if (foundEgg && foundEgg.id !== prevEggRef.current) {
-      SFX.scannerPulse();
-      if (!foundEasterEggs.includes(foundEgg.id)) {
-        setFoundEasterEggs(prev => [...prev, foundEgg!.id]);
-      }
-      setActiveEasterEgg({ emoji: foundEgg.emoji, text: foundEgg.text, x: foundEgg.x, y: foundEgg.y });
-      prevEggRef.current = foundEgg.id;
-    } else if (!foundEgg) {
-      setActiveEasterEgg(null);
-      prevEggRef.current = null;
-    }
-  }, [loc.hotspots, loc.locationKey, foundEvidence, foundEasterEggs]);
+  }, [loc.hotspots, foundEvidence]);
 
   const handleHotspotClick = (hotspot: LocationHotspot) => {
     if (foundEvidence.includes(hotspot.evidenceId)) return;
@@ -125,17 +101,9 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
             <MapPin className="w-4 h-4 text-primary" />
             <span className="text-sm font-medium text-foreground">{loc.name}</span>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground bg-secondary px-3 py-1.5 rounded-md">
-              <Search className="w-3 h-3 text-primary" />
-              <span>{uniqueFound.size}/{totalEvidence} улик</span>
-            </div>
-            {foundEasterEggs.length > 0 && (
-              <div className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground bg-accent/20 px-3 py-1.5 rounded-md">
-                <span>🥚</span>
-                <span>{foundEasterEggs.length} пасхал{foundEasterEggs.length === 1 ? 'ка' : foundEasterEggs.length < 5 ? 'ки' : 'ок'}</span>
-              </div>
-            )}
+          <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground bg-secondary px-3 py-1.5 rounded-md">
+            <Search className="w-3 h-3 text-primary" />
+            <span>{uniqueFound.size}/{totalEvidence} улик</span>
           </div>
         </div>
       </header>
@@ -174,7 +142,7 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="text-center text-sm text-muted-foreground mb-4 font-mono"
           >
-            🔍 Води лупой — исследуй территорию! Ищи улики и пасхалки 🥚
+            🔍 Води лупой по сцене — она покажет скрытые следы и аномалии
           </motion.p>
 
           {/* Scene image with magnifier */}
@@ -252,7 +220,7 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
                     transition: 'border-color 0.2s, box-shadow 0.2s',
                   }}
                 >
-                  {/* Zoomed view */}
+                  {/* Forensic trace view — shows "anomalies" */}
                   <div
                     className="absolute"
                     style={{
@@ -264,7 +232,28 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
                       transformOrigin: 'top left',
                     }}
                   >
-                    <img src={sceneImage} alt="" className="w-full h-full object-cover" style={{ filter: 'brightness(1.3) contrast(1.1)' }} draggable={false} />
+                    <img src={sceneImage} alt="" className="w-full h-full object-cover" style={{
+                      filter: nearHotspot
+                        ? 'brightness(1.6) contrast(1.8) saturate(0.3) hue-rotate(180deg)'
+                        : 'brightness(1.2) contrast(1.4) saturate(0.5) sepia(0.3)',
+                      transition: 'filter 0.3s',
+                    }} draggable={false} />
+                    {/* Hotspot glow markers visible only in magnifier */}
+                    {loc.hotspots.filter(h => !foundEvidence.includes(h.evidenceId)).map(h => (
+                      <div
+                        key={h.id}
+                        className="absolute rounded-full"
+                        style={{
+                          left: `${h.x}%`,
+                          top: `${h.y}%`,
+                          width: 24,
+                          height: 24,
+                          transform: 'translate(-50%, -50%)',
+                          background: 'radial-gradient(circle, hsl(var(--destructive) / 0.6) 0%, transparent 70%)',
+                          boxShadow: '0 0 12px hsl(var(--destructive) / 0.4)',
+                        }}
+                      />
+                    ))}
                   </div>
                   {/* Crosshair */}
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -287,24 +276,8 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
               </div>
             )}
 
-            {/* Easter egg popup */}
-            <AnimatePresence>
-              {activeEasterEgg && isOverScene && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  className="absolute z-30 pointer-events-none"
-                  style={{ left: `${activeEasterEgg.x}%`, top: `${activeEasterEgg.y}%`, transform: 'translate(-50%, -130%)' }}
-                >
-                  <div className="px-4 py-2.5 rounded-xl bg-card/95 backdrop-blur-sm border border-accent/50 shadow-2xl max-w-[220px]">
-                    <p className="text-lg leading-none mb-1">{activeEasterEgg.emoji}</p>
-                    <p className="text-xs text-foreground font-medium">{activeEasterEgg.text}</p>
-                    <p className="text-[10px] text-muted-foreground mt-1">🥚 Пасхалка!</p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+
+
 
             {/* All found overlay */}
             {allLocationEvidenceFound && (
