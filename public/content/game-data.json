@@ -18,7 +18,7 @@
       "difficulty": "Высокая",
       "chapters": 4,
       "totalEvidence": 8,
-      "status": "locked"
+      "status": "available"
     },
     {
       "id": "module_3",
@@ -28,7 +28,7 @@
       "difficulty": "Высокая",
       "chapters": 5,
       "totalEvidence": 12,
-      "status": "locked"
+      "status": "available"
     }
   ],
   "sceneImages": {
@@ -36,7 +36,11 @@
     "hr_department": "/content/images/hr-department.jpg",
     "server_room": "/content/images/server-room.jpg",
     "meeting_room": "/content/images/meeting-room.jpg",
-    "boardroom": "/content/images/boardroom.jpg"
+    "boardroom": "/content/images/boardroom.jpg",
+    "soc_center": "/content/images/soc-center.jpg",
+    "it_department": "/content/images/it-department.jpg",
+    "accounting": "/content/images/accounting.jpg",
+    "archive_room": "/content/images/archive-room.jpg"
   },
   "chapters": [
     {
@@ -103,6 +107,127 @@
         { "id": "hs_9", "evidenceId": "ev_009", "x": 50, "y": 55, "radius": 40, "label": "Папка с отчётом", "hint": "Итоговый отчёт аудита" },
         { "id": "hs_10", "evidenceId": "ev_010", "x": 30, "y": 65, "radius": 35, "label": "Документы на столе", "hint": "Политика конфиденциальности" }
       ]
+    },
+
+    {
+      "id": "ch_m2_1",
+      "moduleId": "module_2",
+      "title": "Сигнал тревоги",
+      "location": "Центр мониторинга (SOC)",
+      "locationKey": "soc_center",
+      "type": "narrative",
+      "description": "Ночная смена в центре мониторинга безопасности. Системы фиксируют массированную атаку на периметр сети компании «ДатаКор».",
+      "hotspots": [
+        { "id": "hs_m2_1", "evidenceId": "ev_m2_001", "x": 35, "y": 45, "radius": 40, "label": "Экран мониторинга", "hint": "Аномальный трафик на дашборде" },
+        { "id": "hs_m2_2", "evidenceId": "ev_m2_002", "x": 70, "y": 55, "radius": 35, "label": "Журнал инцидентов", "hint": "Открытый журнал на столе оператора" }
+      ]
+    },
+    {
+      "id": "ch_m2_2",
+      "moduleId": "module_2",
+      "title": "Вектор атаки",
+      "location": "IT-отдел",
+      "locationKey": "it_department",
+      "type": "dialogue",
+      "description": "Допросите IT-специалистов и восстановите хронологию вторжения.",
+      "hotspots": [
+        { "id": "hs_m2_3", "evidenceId": "ev_m2_003", "x": 45, "y": 40, "radius": 35, "label": "Рабочая станция", "hint": "Открытый терминал с подозрительными командами" },
+        { "id": "hs_m2_4", "evidenceId": "ev_m2_004", "x": 80, "y": 60, "radius": 30, "label": "Флешка на столе", "hint": "Незарегистрированный USB-носитель" }
+      ]
+    },
+    {
+      "id": "ch_m2_3",
+      "moduleId": "module_2",
+      "title": "Глубина проникновения",
+      "location": "Серверная комната",
+      "locationKey": "server_room",
+      "type": "evidence",
+      "description": "Проанализируйте серверы и определите масштаб утечки клиентской базы.",
+      "hotspots": [
+        { "id": "hs_m2_5", "evidenceId": "ev_m2_005", "x": 60, "y": 45, "radius": 40, "label": "Серверная консоль", "hint": "Логи несанкционированного доступа" },
+        { "id": "hs_m2_6", "evidenceId": "ev_m2_006", "x": 25, "y": 65, "radius": 35, "label": "Сетевой шкаф", "hint": "Нестандартное подключение к коммутатору" }
+      ]
+    },
+    {
+      "id": "ch_m2_4",
+      "moduleId": "module_2",
+      "title": "Ловушка захлопывается",
+      "location": "Зал совещаний",
+      "locationKey": "boardroom",
+      "type": "narrative",
+      "description": "Предъявите доказательства и установите виновных в атаке на инфраструктуру.",
+      "hotspots": [
+        { "id": "hs_m2_7", "evidenceId": "ev_m2_007", "x": 55, "y": 50, "radius": 40, "label": "Презентация на экране", "hint": "Схема атаки на проекторе" },
+        { "id": "hs_m2_8", "evidenceId": "ev_m2_008", "x": 35, "y": 70, "radius": 35, "label": "Папка с отчётами", "hint": "Результаты форензик-анализа" }
+      ]
+    },
+
+    {
+      "id": "ch_m3_1",
+      "moduleId": "module_3",
+      "title": "Аномалия",
+      "location": "Бухгалтерия",
+      "locationKey": "accounting",
+      "type": "narrative",
+      "description": "В компании «СтройИнвест» обнаружена массовая продажа персональных данных сотрудников. Начните расследование с бухгалтерии.",
+      "hotspots": [
+        { "id": "hs_m3_1", "evidenceId": "ev_m3_001", "x": 40, "y": 50, "radius": 35, "label": "Таблицы на мониторе", "hint": "Странные транзакции в ведомости" },
+        { "id": "hs_m3_2", "evidenceId": "ev_m3_002", "x": 75, "y": 55, "radius": 30, "label": "Стопка документов", "hint": "Незаполненные согласия на обработку ПД" }
+      ]
+    },
+    {
+      "id": "ch_m3_2",
+      "moduleId": "module_3",
+      "title": "Бумажный след",
+      "location": "Архив",
+      "locationKey": "archive_room",
+      "type": "evidence",
+      "description": "Изучите архивные документы и найдите следы систематических нарушений.",
+      "hotspots": [
+        { "id": "hs_m3_3", "evidenceId": "ev_m3_003", "x": 50, "y": 60, "radius": 40, "label": "Открытая папка", "hint": "Папка с удалёнными записями" },
+        { "id": "hs_m3_4", "evidenceId": "ev_m3_004", "x": 20, "y": 45, "radius": 35, "label": "Картотечный ящик", "hint": "Пустой ящик — документы изъяты" },
+        { "id": "hs_m3_5", "evidenceId": "ev_m3_005", "x": 80, "y": 40, "radius": 30, "label": "Записка на столе", "hint": "Клочок бумаги с номером телефона" }
+      ]
+    },
+    {
+      "id": "ch_m3_3",
+      "moduleId": "module_3",
+      "title": "Круг подозреваемых",
+      "location": "Отдел кадров",
+      "locationKey": "hr_department",
+      "type": "dialogue",
+      "description": "Допросите сотрудников HR-отдела и выясните, кто систематически нарушал процедуры.",
+      "hotspots": [
+        { "id": "hs_m3_6", "evidenceId": "ev_m3_006", "x": 55, "y": 48, "radius": 35, "label": "Экран компьютера", "hint": "Открытая база с ПД без авторизации" },
+        { "id": "hs_m3_7", "evidenceId": "ev_m3_007", "x": 30, "y": 62, "radius": 35, "label": "Ежедневник", "hint": "Записи о встречах с «покупателем»" }
+      ]
+    },
+    {
+      "id": "ch_m3_4",
+      "moduleId": "module_3",
+      "title": "Противостояние",
+      "location": "Переговорная",
+      "locationKey": "meeting_room",
+      "type": "dialogue",
+      "description": "Лицом к лицу с инсайдером. Используйте собранные улики для разоблачения.",
+      "hotspots": [
+        { "id": "hs_m3_8", "evidenceId": "ev_m3_008", "x": 45, "y": 55, "radius": 35, "label": "Телефон на столе", "hint": "Телефон подозреваемой с перепиской" },
+        { "id": "hs_m3_9", "evidenceId": "ev_m3_009", "x": 65, "y": 35, "radius": 35, "label": "Доска", "hint": "Временная шкала нарушений" }
+      ]
+    },
+    {
+      "id": "ch_m3_5",
+      "moduleId": "module_3",
+      "title": "Приговор",
+      "location": "Кабинет директора",
+      "locationKey": "directors_office",
+      "type": "narrative",
+      "description": "Представьте полную картину нарушений руководству и определите меры ответственности.",
+      "hotspots": [
+        { "id": "hs_m3_10", "evidenceId": "ev_m3_010", "x": 50, "y": 50, "radius": 40, "label": "Итоговый отчёт", "hint": "Полный отчёт о нарушениях 152-ФЗ" },
+        { "id": "hs_m3_11", "evidenceId": "ev_m3_011", "x": 25, "y": 40, "radius": 30, "label": "Приказ на столе", "hint": "Проект приказа об увольнении" },
+        { "id": "hs_m3_12", "evidenceId": "ev_m3_012", "x": 75, "y": 65, "radius": 35, "label": "Письмо РКН", "hint": "Ответ Роскомнадзора на жалобу" }
+      ]
     }
   ],
   "dialogue": [
@@ -153,6 +278,105 @@
       "emotion": "nervous",
       "text": "Нет, ещё нет. А нужно? У нас есть 72 часа по закону, верно?",
       "evidenceUnlock": "ev_001"
+    },
+
+    {
+      "id": "m2_line_1",
+      "speaker": "character",
+      "characterName": "Оператор Смирнов",
+      "emotion": "nervous",
+      "text": "Системы зафиксировали аномальный всплеск трафика в 03:15. Кто-то сканирует порты по всему периметру."
+    },
+    {
+      "id": "m2_line_2",
+      "speaker": "character",
+      "characterName": "Оператор Смирнов",
+      "emotion": "nervous",
+      "text": "Мы пытались заблокировать, но атакующий использует распределённую сеть. IP-адреса постоянно меняются."
+    },
+    {
+      "id": "m2_line_3",
+      "speaker": "player",
+      "characterName": "Вы",
+      "emotion": "neutral",
+      "text": "",
+      "choices": [
+        { "id": "m2_c1", "label": "Какие системы уже скомпрометированы?", "next": "m2_line_4a" },
+        { "id": "m2_c2", "label": "Есть ли признаки внутреннего содействия?", "next": "m2_line_4b" },
+        { "id": "m2_c3", "label": "Когда последний раз обновляли файрвол?", "next": "m2_line_4c" }
+      ]
+    },
+    {
+      "id": "m2_line_4a",
+      "speaker": "character",
+      "characterName": "Оператор Смирнов",
+      "emotion": "nervous",
+      "text": "Пока точно известно о почтовом сервере и CRM-системе. Но атака продолжается — масштаб может быть больше."
+    },
+    {
+      "id": "m2_line_4b",
+      "speaker": "character",
+      "characterName": "Оператор Смирнов",
+      "emotion": "neutral",
+      "text": "Странно, что вы спросили... Один из VPN-туннелей был активен из офиса в момент атаки. Но ведь ночью здесь никого не было.",
+      "evidenceUnlock": "ev_m2_002"
+    },
+    {
+      "id": "m2_line_4c",
+      "speaker": "character",
+      "characterName": "Оператор Смирнов",
+      "emotion": "nervous",
+      "text": "Э-э... Месяца три назад. Знаю, что надо чаще, но у нас не было бюджета на лицензию.",
+      "evidenceUnlock": "ev_m2_001"
+    },
+
+    {
+      "id": "m3_line_1",
+      "speaker": "character",
+      "characterName": "Главбух Кузнецова",
+      "emotion": "neutral",
+      "text": "Я заметила странности в расчётных ведомостях. Данные сотрудников кто-то копирует — СНИЛС, паспорта, адреса."
+    },
+    {
+      "id": "m3_line_2",
+      "speaker": "character",
+      "characterName": "Главбух Кузнецова",
+      "emotion": "nervous",
+      "text": "Уже третий месяц подряд. Сначала думала — ошибка в системе. Но это не ошибка."
+    },
+    {
+      "id": "m3_line_3",
+      "speaker": "player",
+      "characterName": "Вы",
+      "emotion": "neutral",
+      "text": "",
+      "choices": [
+        { "id": "m3_c1", "label": "Кто имеет доступ к этим ведомостям?", "next": "m3_line_4a" },
+        { "id": "m3_c2", "label": "Оформлены ли согласия на обработку ПД?", "next": "m3_line_4b" },
+        { "id": "m3_c3", "label": "Куда уходят скопированные данные?", "next": "m3_line_4c" }
+      ]
+    },
+    {
+      "id": "m3_line_4a",
+      "speaker": "character",
+      "characterName": "Главбух Кузнецова",
+      "emotion": "neutral",
+      "text": "Я, мой заместитель и начальница HR Воронова. Но система не требует авторизации для просмотра — это давняя проблема."
+    },
+    {
+      "id": "m3_line_4b",
+      "speaker": "character",
+      "characterName": "Главбух Кузнецова",
+      "emotion": "nervous",
+      "text": "Честно? Не уверена. Воронова отвечала за это. Но я слышала, что многие формы просто не заполнялись.",
+      "evidenceUnlock": "ev_m3_002"
+    },
+    {
+      "id": "m3_line_4c",
+      "speaker": "character",
+      "characterName": "Главбух Кузнецова",
+      "emotion": "nervous",
+      "text": "Я нашла следы выгрузки на внешний адрес. Какой-то облачный сервис. Это точно не наш корпоративный."
     }
   ],
   "evidence": [
@@ -255,6 +479,208 @@
       "connections": ["ev_001", "ev_006"],
       "violationRef": "Ст. 18.1 152-ФЗ",
       "isSecret": false
+    },
+
+    {
+      "id": "ev_m2_001",
+      "title": "Устаревшие правила файрвола",
+      "type": "log",
+      "description": "Файрвол не обновлялся 3 месяца. Известная уязвимость CVE-2024-XXXX не была закрыта патчем.",
+      "chapter": 1,
+      "connections": ["ev_m2_005"],
+      "violationRef": "Ст. 19 152-ФЗ",
+      "isSecret": false
+    },
+    {
+      "id": "ev_m2_002",
+      "title": "Журнал VPN-подключений",
+      "type": "log",
+      "description": "В 02:50 зафиксировано VPN-подключение с учётной записи администратора Лебедева. Он утверждает, что спал.",
+      "chapter": 1,
+      "connections": ["ev_m2_004"],
+      "violationRef": null,
+      "isSecret": false
+    },
+    {
+      "id": "ev_m2_003",
+      "title": "История команд терминала",
+      "type": "log",
+      "description": "На рабочей станции Лебедева обнаружены команды массового экспорта из БД: mysqldump --all-databases. Временная метка совпадает с атакой.",
+      "chapter": 2,
+      "connections": ["ev_m2_002", "ev_m2_005"],
+      "violationRef": "Ст. 19 152-ФЗ",
+      "isSecret": false
+    },
+    {
+      "id": "ev_m2_004",
+      "title": "Незарегистрированная флешка",
+      "type": "file",
+      "description": "USB-накопитель 64 ГБ с утилитами для пентестинга и скриптами автоматического сбора данных. Не числится в инвентаре IT-отдела.",
+      "chapter": 2,
+      "connections": ["ev_m2_003", "ev_m2_002"],
+      "violationRef": "Ст. 19 152-ФЗ",
+      "isSecret": true
+    },
+    {
+      "id": "ev_m2_005",
+      "title": "Логи сетевого трафика",
+      "type": "log",
+      "description": "Зафиксирована передача 2.3 ГБ данных на внешний сервер через зашифрованный туннель. Сервер зарегистрирован на подставную компанию.",
+      "chapter": 3,
+      "connections": ["ev_m2_001", "ev_m2_003"],
+      "violationRef": "Ст. 12 152-ФЗ",
+      "isSecret": false
+    },
+    {
+      "id": "ev_m2_006",
+      "title": "Нелегальное сетевое устройство",
+      "type": "file",
+      "description": "В серверном шкафу обнаружен миниатюрный роутер, не входящий в схему сети. Подключён к магистральному каналу.",
+      "chapter": 3,
+      "connections": ["ev_m2_005"],
+      "violationRef": "Ст. 19 152-ФЗ",
+      "isSecret": true
+    },
+    {
+      "id": "ev_m2_007",
+      "title": "Финансовый след",
+      "type": "document",
+      "description": "На счёт Лебедева за последний месяц поступило 3 перевода от неизвестного отправителя на общую сумму 450 000 руб.",
+      "chapter": 4,
+      "connections": ["ev_m2_003", "ev_m2_004"],
+      "violationRef": null,
+      "isSecret": false
+    },
+    {
+      "id": "ev_m2_008",
+      "title": "Отчёт форензик-анализа",
+      "type": "document",
+      "description": "Полный анализ скомпрометированных систем: похищены ПД 120 000 клиентов, включая платёжные данные. Шифрование БД отсутствовало.",
+      "chapter": 4,
+      "connections": ["ev_m2_001", "ev_m2_005"],
+      "violationRef": "Ст. 19 152-ФЗ",
+      "isSecret": false
+    },
+
+    {
+      "id": "ev_m3_001",
+      "title": "Аномалии в ведомостях",
+      "type": "document",
+      "description": "За 3 месяца зафиксировано 47 выгрузок полных ПД сотрудников, не связанных с рабочими задачами.",
+      "chapter": 1,
+      "connections": ["ev_m3_006"],
+      "violationRef": "Ст. 5 152-ФЗ",
+      "isSecret": false
+    },
+    {
+      "id": "ev_m3_002",
+      "title": "Отсутствующие согласия",
+      "type": "document",
+      "description": "У 60% сотрудников отсутствуют подписанные согласия на обработку персональных данных. Формы не заполнялись при приёме на работу.",
+      "chapter": 1,
+      "connections": ["ev_m3_001"],
+      "violationRef": "Ст. 9 152-ФЗ",
+      "isSecret": false
+    },
+    {
+      "id": "ev_m3_003",
+      "title": "Подчищенная папка",
+      "type": "file",
+      "description": "В архиве обнаружена папка с вырванными страницами. Удалены записи за октябрь-декабрь — период начала утечки.",
+      "chapter": 2,
+      "connections": ["ev_m3_001", "ev_m3_004"],
+      "violationRef": null,
+      "isSecret": false
+    },
+    {
+      "id": "ev_m3_004",
+      "title": "Пустой картотечный ящик",
+      "type": "file",
+      "description": "Ящик с личными делами уволенных сотрудников полностью пуст. По журналу учёта там должно быть 34 дела. Нарушен срок хранения ПД.",
+      "chapter": 2,
+      "connections": ["ev_m3_003"],
+      "violationRef": "Ст. 21 152-ФЗ",
+      "isSecret": false
+    },
+    {
+      "id": "ev_m3_005",
+      "title": "Записка с контактом",
+      "type": "file",
+      "description": "Клочок бумаги с номером телефона и пометкой «Покупатель — вт/чт, после 18:00». Почерк совпадает с записями Вороновой.",
+      "chapter": 2,
+      "connections": ["ev_m3_007"],
+      "violationRef": null,
+      "isSecret": true
+    },
+    {
+      "id": "ev_m3_006",
+      "title": "Экран без авторизации",
+      "type": "log",
+      "description": "Система управления ПД не требует пароля для входа. Любой сотрудник HR может просматривать и выгружать все персональные данные.",
+      "chapter": 3,
+      "connections": ["ev_m3_001", "ev_m3_002"],
+      "violationRef": "Ст. 19 152-ФЗ",
+      "isSecret": false
+    },
+    {
+      "id": "ev_m3_007",
+      "title": "Ежедневник Вороновой",
+      "type": "document",
+      "description": "В ежедневнике начальницы HR записи: «Передать список — 500₽/строка», «Новая партия — 200 записей». Систематическая продажа ПД.",
+      "chapter": 3,
+      "connections": ["ev_m3_005", "ev_m3_008"],
+      "violationRef": "Ст. 7 152-ФЗ",
+      "isSecret": false
+    },
+    {
+      "id": "ev_m3_008",
+      "title": "Переписка в мессенджере",
+      "type": "email",
+      "description": "На телефоне Вороновой обнаружена переписка с неизвестным: обсуждение цен на базы данных сотрудников, графики передачи.",
+      "chapter": 4,
+      "connections": ["ev_m3_007", "ev_m3_005"],
+      "violationRef": "Ст. 7 152-ФЗ",
+      "isSecret": false
+    },
+    {
+      "id": "ev_m3_009",
+      "title": "Хронология нарушений",
+      "type": "document",
+      "description": "Восстановленная временная шкала: продажа ПД велась 5 месяцев. Всего передано ~1 200 записей с полными персональными данными.",
+      "chapter": 4,
+      "connections": ["ev_m3_001", "ev_m3_008"],
+      "violationRef": "Ст. 5 152-ФЗ",
+      "isSecret": false
+    },
+    {
+      "id": "ev_m3_010",
+      "title": "Итоговый отчёт о нарушениях",
+      "type": "document",
+      "description": "Полный перечень нарушений 152-ФЗ: отсутствие согласий, незащищённые системы, нелегальная передача третьим лицам, нарушение сроков хранения.",
+      "chapter": 5,
+      "connections": ["ev_m3_002", "ev_m3_006", "ev_m3_009"],
+      "violationRef": "Ст. 5, 7, 9, 19, 21 152-ФЗ",
+      "isSecret": false
+    },
+    {
+      "id": "ev_m3_011",
+      "title": "Проект приказа",
+      "type": "document",
+      "description": "Приказ об увольнении Вороновой Н.А. по статье с передачей материалов в правоохранительные органы.",
+      "chapter": 5,
+      "connections": ["ev_m3_007"],
+      "violationRef": null,
+      "isSecret": false
+    },
+    {
+      "id": "ev_m3_012",
+      "title": "Предписание Роскомнадзора",
+      "type": "document",
+      "description": "Роскомнадзор выдал предписание: устранить нарушения в 30 дней, назначить ответственного за обработку ПД, провести аудит всех процессов.",
+      "chapter": 5,
+      "connections": ["ev_m3_010"],
+      "violationRef": "Ст. 23 152-ФЗ",
+      "isSecret": true
     }
   ],
   "evidenceMatches": [
@@ -281,6 +707,56 @@
       "conclusion": "Нарушен принцип минимизации доступа к ПД",
       "correctEvidence": ["ev_005", "ev_006"],
       "hint": "Какие документы указывают на избыточный доступ?"
+    },
+
+    {
+      "id": "match_m2_1",
+      "conclusion": "Атака стала возможна из-за устаревшей защиты периметра",
+      "correctEvidence": ["ev_m2_001", "ev_m2_006"],
+      "hint": "Какие улики указывают на уязвимости инфраструктуры?"
+    },
+    {
+      "id": "match_m2_2",
+      "conclusion": "Администратор Лебедев содействовал атаке изнутри",
+      "correctEvidence": ["ev_m2_003", "ev_m2_007"],
+      "hint": "Какие улики связывают сотрудника с атакой?"
+    },
+    {
+      "id": "match_m2_3",
+      "conclusion": "Данные клиентов были переданы за рубеж без правовых оснований",
+      "correctEvidence": ["ev_m2_005", "ev_m2_008"],
+      "hint": "Какие улики показывают масштаб и направление утечки?"
+    },
+    {
+      "id": "match_m2_4",
+      "conclusion": "VPN-доступ использован для маскировки внешней атаки",
+      "correctEvidence": ["ev_m2_002", "ev_m2_004"],
+      "hint": "Как атакующий скрывал свои действия?"
+    },
+
+    {
+      "id": "match_m3_1",
+      "conclusion": "Систематическая продажа ПД сотрудников третьим лицам",
+      "correctEvidence": ["ev_m3_007", "ev_m3_008"],
+      "hint": "Какие улики доказывают умышленную продажу данных?"
+    },
+    {
+      "id": "match_m3_2",
+      "conclusion": "Отсутствие базовых мер защиты ПД в компании",
+      "correctEvidence": ["ev_m3_002", "ev_m3_006"],
+      "hint": "Какие системные нарушения допустила компания?"
+    },
+    {
+      "id": "match_m3_3",
+      "conclusion": "Уничтожение улик и нарушение порядка хранения ПД",
+      "correctEvidence": ["ev_m3_003", "ev_m3_004"],
+      "hint": "Какие улики указывают на сокрытие следов?"
+    },
+    {
+      "id": "match_m3_4",
+      "conclusion": "Воронова — организатор схемы продажи персональных данных",
+      "correctEvidence": ["ev_m3_005", "ev_m3_009"],
+      "hint": "Какие улики прямо указывают на виновника?"
     }
   ]
 }
