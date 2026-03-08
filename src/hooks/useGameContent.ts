@@ -79,7 +79,8 @@ let cachedData: GameData | null = null;
 
 async function loadGameData(): Promise<GameData> {
   if (cachedData) return cachedData;
-  const res = await fetch('/content/game-data.json');
+  const base = import.meta.env.BASE_URL || '/';
+  const res = await fetch(`${base}content/game-data.json`);
   cachedData = await res.json();
   return cachedData!;
 }
