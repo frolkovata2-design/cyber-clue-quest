@@ -1,7 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, X, AlertTriangle, FileText, Terminal, Mail, File, Eye, ChevronRight } from 'lucide-react';
+import { Search, MapPin, AlertTriangle, FileText, Terminal, Mail, File, Eye, ChevronRight } from 'lucide-react';
 import { SAMPLE_EVIDENCE, SCENE_IMAGES } from '@/data/gameContent';
+import { SFX } from '@/lib/sfx';
 
 interface LocationHotspot {
   id: string;
@@ -27,7 +28,7 @@ interface LocationExplorerProps {
   onComplete: () => void;
 }
 
-const typeIcons = {
+const typeIcons: Record<string, any> = {
   document: FileText,
   log: Terminal,
   email: Mail,
@@ -39,27 +40,54 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
   const [activeLocation, setActiveLocation] = useState(0);
   const [hoveredHotspot, setHoveredHotspot] = useState<string | null>(null);
   const [selectedEvidence, setSelectedEvidence] = useState<string | null>(null);
-  const [animatingEvidence, setAnimatingEvidence] = useState<string | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isOverScene, setIsOverScene] = useState(false);
+  const [nearHotspot, setNearHotspot] = useState(false);
+  const sceneRef = useRef<HTMLDivElement>(null);
+  const prevHoveredRef = useRef<string | null>(null);
 
   const loc = locations[activeLocation];
   const sceneImage = SCENE_IMAGES[loc.locationKey];
   const totalEvidence = locations.reduce((sum, l) => sum + l.hotspots.length, 0);
-  const uniqueFoundCount = new Set(foundEvidence).size;
+  const uniqueFound = new Set(foundEvidence);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!sceneRef.current) return;
+    const rect = sceneRef.current.getBoundingClientRect();
+    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+
+    // Check proximity to any hotspot
+    const pctX = ((e.clientX - rect.left) / rect.width) * 100;
+    const pctY = ((e.clientY - rect.top) / rect.height) * 100;
+    let near = false;
+    for (const hs of loc.hotspots) {
+      if (foundEvidence.includes(hs.evidenceId)) continue;
+      const dx = pctX - hs.x;
+      const dy = pctY - hs.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 12) { near = true; break; }
+    }
+    setNearHotspot(near);
+  }, [loc.hotspots, foundEvidence]);
 
   const handleHotspotClick = (hotspot: LocationHotspot) => {
     if (foundEvidence.includes(hotspot.evidenceId)) return;
+    SFX.hotspotClick();
     setSelectedEvidence(hotspot.evidenceId);
   };
 
-  const handleClosePopup = (evidenceId: string) => {
-    setAnimatingEvidence(evidenceId);
-    setSelectedEvidence(null);
+  const handleHotspotHover = (id: string | null) => {
+    if (id && id !== prevHoveredRef.current) {
+      SFX.hotspotHover();
+    }
+    prevHoveredRef.current = id;
+    setHoveredHotspot(id);
+  };
 
-    // Short delay then add to collection
-    setTimeout(() => {
-      onEvidenceFound(evidenceId);
-      setTimeout(() => setAnimatingEvidence(null), 600);
-    }, 300);
+  const handleClosePopup = (evidenceId: string) => {
+    SFX.evidenceFound();
+    setSelectedEvidence(null);
+    setTimeout(() => onEvidenceFound(evidenceId), 200);
   };
 
   const allLocationEvidenceFound = loc.hotspots.every(h => foundEvidence.includes(h.evidenceId));
@@ -75,7 +103,7 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
           </div>
           <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground bg-secondary px-3 py-1.5 rounded-md">
             <Search className="w-3 h-3 text-primary" />
-            <span>{uniqueFoundCount}/{totalEvidence} улик</span>
+            <span>{uniqueFound.size}/{totalEvidence} улик</span>
           </div>
         </div>
       </header>
@@ -84,106 +112,89 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
       <div className="border-b border-border bg-card/50">
         <div className="max-w-5xl mx-auto flex overflow-x-auto">
           {locations.map((l, i) => {
-            const locFound = l.hotspots.every(h => foundEvidence.includes(h.evidenceId));
-            const hasAnyFound = l.hotspots.some(h => foundEvidence.includes(h.evidenceId));
+            const locDone = l.hotspots.every(h => foundEvidence.includes(h.evidenceId));
+            const hasAny = l.hotspots.some(h => foundEvidence.includes(h.evidenceId));
             return (
               <button
                 key={l.id}
-                onClick={() => setActiveLocation(i)}
+                onClick={() => { setActiveLocation(i); SFX.transition(); }}
                 className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   i === activeLocation
                     ? 'border-primary text-primary'
-                    : locFound
+                    : locDone
                     ? 'border-transparent text-muted-foreground/60'
                     : 'border-transparent text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <MapPin className="w-3 h-3" />
                 {l.name}
-                {locFound && <span className="text-xs text-primary">✓</span>}
-                {!locFound && hasAnyFound && (
-                  <span className="w-2 h-2 rounded-full bg-primary/50" />
-                )}
+                {locDone && <span className="text-xs text-primary">✓</span>}
+                {!locDone && hasAny && <span className="w-2 h-2 rounded-full bg-primary/50" />}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Scene with hotspots */}
+      {/* Scene */}
       <div className="flex-1 flex flex-col">
         <div className="max-w-5xl w-full mx-auto px-4 py-8 flex-1">
-          {/* Instruction */}
           {!allLocationEvidenceFound && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
               className="text-center text-sm text-muted-foreground mb-4 font-mono"
             >
-              🔍 Нажмите на подсвеченные объекты, чтобы найти улики
+              🔍 Водите курсором по сцене — лупа подскажет, где улики
             </motion.p>
           )}
 
-          {/* Scene image */}
-          <div className="relative rounded-xl overflow-hidden border border-border shadow-2xl">
-            <img
-              src={sceneImage}
-              alt={loc.name}
-              className="w-full h-auto block"
-              draggable={false}
-            />
+          {/* Scene image with magnifier */}
+          <div
+            ref={sceneRef}
+            className="relative rounded-xl overflow-hidden border border-border shadow-2xl"
+            style={{ cursor: isOverScene ? 'none' : 'default' }}
+            onMouseEnter={() => setIsOverScene(true)}
+            onMouseLeave={() => { setIsOverScene(false); setNearHotspot(false); }}
+            onMouseMove={handleMouseMove}
+          >
+            <img src={sceneImage} alt={loc.name} className="w-full h-auto block" draggable={false} />
 
             {/* Hotspots */}
             {loc.hotspots.map((hotspot) => {
               const isFound = foundEvidence.includes(hotspot.evidenceId);
               const isHovered = hoveredHotspot === hotspot.id;
-
               return (
                 <motion.button
                   key={hotspot.id}
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.5 }}
-                  className={`absolute z-10 group ${isFound ? 'pointer-events-none' : 'cursor-pointer'}`}
-                  style={{
-                    left: `${hotspot.x}%`,
-                    top: `${hotspot.y}%`,
-                    transform: 'translate(-50%, -50%)',
-                  }}
-                  onMouseEnter={() => setHoveredHotspot(hotspot.id)}
-                  onMouseLeave={() => setHoveredHotspot(null)}
+                  className={`absolute z-10 ${isFound ? 'pointer-events-none' : 'cursor-none'}`}
+                  style={{ left: `${hotspot.x}%`, top: `${hotspot.y}%`, transform: 'translate(-50%, -50%)' }}
+                  onMouseEnter={() => handleHotspotHover(hotspot.id)}
+                  onMouseLeave={() => handleHotspotHover(null)}
                   onClick={() => handleHotspotClick(hotspot)}
                 >
-                  {/* Pulsing ring */}
                   {!isFound && (
                     <>
                       <motion.div
-                        animate={{ scale: [1, 1.8, 1], opacity: [0.6, 0, 0.6] }}
+                        animate={{ scale: [1, 1.8, 1], opacity: [0.5, 0, 0.5] }}
                         transition={{ duration: 2, repeat: Infinity }}
-                        className="absolute inset-0 w-12 h-12 -m-1.5 rounded-full border-2 border-primary/50"
+                        className="absolute inset-0 w-12 h-12 -m-1.5 rounded-full border-2 border-primary/40"
                       />
                       <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-                        isHovered
-                          ? 'bg-primary shadow-lg shadow-primary/50 scale-125'
-                          : 'bg-primary/30 backdrop-blur-sm border border-primary/50'
+                        isHovered ? 'bg-primary shadow-lg shadow-primary/50 scale-125' : 'bg-primary/20 backdrop-blur-sm border border-primary/40'
                       }`}>
                         <Search className={`w-4 h-4 ${isHovered ? 'text-primary-foreground' : 'text-primary'}`} />
                       </div>
                     </>
                   )}
-
-                  {/* Found marker */}
                   {isFound && (
                     <div className="w-8 h-8 rounded-full bg-primary/20 border-2 border-primary/40 flex items-center justify-center">
                       <span className="text-primary text-xs">✓</span>
                     </div>
                   )}
-
-                  {/* Tooltip */}
                   {isHovered && !isFound && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 5 }}
-                      animate={{ opacity: 1, y: 0 }}
+                    <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}
                       className="absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap z-20"
                     >
                       <div className="px-3 py-1.5 rounded-md bg-card border border-border text-xs font-medium text-foreground shadow-xl">
@@ -195,11 +206,60 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
               );
             })}
 
-            {/* Location complete overlay */}
-            {allLocationEvidenceFound && loc.hotspots.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+            {/* Magnifier lens following cursor */}
+            {isOverScene && (
+              <div
+                className="absolute z-20 pointer-events-none"
+                style={{ left: mousePos.x - 50, top: mousePos.y - 50, width: 100, height: 100 }}
+              >
+                <div
+                  className="w-full h-full rounded-full overflow-hidden border-2 relative"
+                  style={{
+                    borderColor: nearHotspot ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.3)',
+                    boxShadow: nearHotspot
+                      ? '0 0 25px hsl(var(--primary) / 0.5), inset 0 0 15px hsl(var(--primary) / 0.1)'
+                      : '0 0 15px hsl(var(--background) / 0.7)',
+                    transition: 'border-color 0.2s, box-shadow 0.2s',
+                  }}
+                >
+                  {/* Zoomed view */}
+                  <div
+                    className="absolute"
+                    style={{
+                      width: sceneRef.current?.offsetWidth ?? 800,
+                      height: sceneRef.current?.offsetHeight ?? 450,
+                      left: -(mousePos.x * 1.5 - 50),
+                      top: -(mousePos.y * 1.5 - 50),
+                      transform: 'scale(1.5)',
+                      transformOrigin: 'top left',
+                    }}
+                  >
+                    <img src={sceneImage} alt="" className="w-full h-full object-cover" style={{ filter: 'brightness(1.3) contrast(1.1)' }} draggable={false} />
+                  </div>
+                  {/* Crosshair */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-px h-5 bg-primary/30 absolute" />
+                    <div className="h-px w-5 bg-primary/30 absolute" />
+                  </div>
+                  {/* Pulse when near */}
+                  {nearHotspot && (
+                    <motion.div
+                      className="absolute inset-0 rounded-full border-2 border-primary"
+                      animate={{ scale: [1, 1.15, 1], opacity: [0.7, 0.2, 0.7] }}
+                      transition={{ duration: 0.8, repeat: Infinity }}
+                    />
+                  )}
+                </div>
+                {/* Handle */}
+                <div className="absolute -bottom-3 -right-3 w-5 h-8 bg-muted-foreground/20 rounded-b-full"
+                  style={{ transform: 'rotate(45deg)', transformOrigin: 'top left' }}
+                />
+              </div>
+            )}
+
+            {/* All found overlay */}
+            {allLocationEvidenceFound && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                 className="absolute inset-0 bg-background/30 flex items-center justify-center"
               >
                 <div className="bg-card/90 backdrop-blur-sm border border-primary/30 rounded-xl px-6 py-4 text-center shadow-2xl">
@@ -210,31 +270,29 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
             )}
           </div>
 
-          {/* Next location / Complete button */}
+          {/* Navigation */}
           <div className="mt-6 flex justify-end">
             {activeLocation < locations.length - 1 ? (
               <button
-                onClick={() => setActiveLocation(prev => prev + 1)}
+                onClick={() => { setActiveLocation(p => p + 1); SFX.transition(); }}
                 className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium bg-secondary text-foreground rounded-lg hover:bg-secondary/80 transition-colors"
               >
                 Следующая локация <ChevronRight className="w-4 h-4" />
               </button>
             ) : (
-              uniqueFoundCount > 0 && (
-                <motion.button
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  onClick={onComplete}
+              uniqueFound.size > 0 && (
+                <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                  onClick={() => { SFX.complete(); onComplete(); }}
                   className="px-6 py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:scale-105 active:scale-95 transition-transform shadow-lg shadow-primary/20"
                 >
-                  🧩 Перейти к расследованию
+                  🧩 Сопоставить улики
                 </motion.button>
               )
             )}
           </div>
         </div>
 
-        {/* Collected evidence bar at bottom */}
+        {/* Bottom evidence bar */}
         {foundEvidence.length > 0 && (
           <div className="border-t border-border bg-card/80 backdrop-blur-sm px-4 py-4">
             <div className="max-w-5xl mx-auto">
@@ -247,8 +305,7 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
                   if (!ev) return null;
                   const Icon = typeIcons[ev.type] || FileText;
                   return (
-                    <motion.div
-                      key={ev.id}
+                    <motion.div key={ev.id}
                       initial={{ scale: 0, y: -30 }}
                       animate={{ scale: 1, y: 0 }}
                       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -259,9 +316,7 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
                       </div>
                       <div className="min-w-0">
                         <p className="text-xs font-medium text-foreground truncate">{ev.title}</p>
-                        {ev.violationRef && (
-                          <p className="text-[10px] text-destructive font-mono">{ev.violationRef}</p>
-                        )}
+                        {ev.violationRef && <p className="text-[10px] text-destructive font-mono">{ev.violationRef}</p>}
                       </div>
                     </motion.div>
                   );
@@ -272,7 +327,7 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
         )}
       </div>
 
-      {/* Evidence popup modal */}
+      {/* Evidence popup */}
       <AnimatePresence>
         {selectedEvidence && (() => {
           const ev = SAMPLE_EVIDENCE.find(e => e.id === selectedEvidence);
@@ -280,9 +335,7 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
           const Icon = typeIcons[ev.type] || FileText;
           return (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4"
               onClick={() => handleClosePopup(selectedEvidence)}
             >
@@ -296,9 +349,7 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
                 style={{ boxShadow: '0 0 60px hsl(var(--primary) / 0.2)' }}
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* Glow effect */}
                 <div className="absolute -inset-1 bg-primary/10 rounded-2xl blur-xl -z-10" />
-
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0">
                     <Icon className="w-6 h-6 text-primary" />
@@ -315,7 +366,6 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
                     )}
                   </div>
                 </div>
-
                 <button
                   onClick={() => handleClosePopup(selectedEvidence)}
                   className="mt-6 w-full py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:scale-[1.02] active:scale-95 transition-transform text-sm"

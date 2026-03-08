@@ -4,9 +4,10 @@ import { CHAPTERS, SAMPLE_EVIDENCE } from '@/data/gameContent';
 import { useGameStore } from '@/stores/gameStore';
 import ComicStrip from '@/components/game/ComicStrip';
 import LocationExplorer from '@/components/game/LocationExplorer';
+import EvidenceBoard from '@/components/game/EvidenceBoard';
 import DeductionPhase from '@/components/game/DeductionPhase';
 
-type GamePhase = 'comic' | 'explore' | 'deduction';
+type GamePhase = 'comic' | 'explore' | 'match' | 'deduction';
 
 const Chapter = () => {
   const navigate = useNavigate();
@@ -58,6 +59,15 @@ const Chapter = () => {
         locations={locations}
         foundEvidence={foundEvidence}
         onEvidenceFound={handleEvidenceFound}
+        onComplete={() => setPhase('match')}
+      />
+    );
+  }
+
+  if (phase === 'match') {
+    return (
+      <EvidenceBoard
+        foundEvidence={foundEvidence}
         onComplete={() => setPhase('deduction')}
       />
     );

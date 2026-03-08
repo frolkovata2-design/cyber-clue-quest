@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle, AlertTriangle, FileText, Terminal, Mail, File, Eye, Scale } from 'lucide-react';
 import { SAMPLE_EVIDENCE } from '@/data/gameContent';
+import { SFX } from '@/lib/sfx';
 
 interface DeductionPhaseProps {
   foundEvidence: string[];
@@ -79,6 +80,7 @@ const DeductionPhase = ({ foundEvidence, onComplete }: DeductionPhaseProps) => {
       [question.id]: { selected: optionId, correct: option.correct },
     }));
     setShowExplanation(true);
+    if (option.correct) SFX.correct(); else SFX.wrong();
   };
 
   const handleNext = () => {
