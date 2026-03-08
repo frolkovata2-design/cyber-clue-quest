@@ -59,9 +59,10 @@ export const useGameStore = create<GameState>((set) => ({
   setChapter: (chapterId) => set({ currentChapter: chapterId }),
 
   addEvidence: (evidence) =>
-    set((state) => ({
-      evidence: [...state.evidence, { ...evidence, discoveredAt: new Date() }],
-    })),
+    set((state) => {
+      if (state.evidence.some(e => e.id === evidence.id)) return state;
+      return { evidence: [...state.evidence, { ...evidence, discoveredAt: new Date() }] };
+    }),
 
   completeChapter: (chapterId) =>
     set((state) => ({
