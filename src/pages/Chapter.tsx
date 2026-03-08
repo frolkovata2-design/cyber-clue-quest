@@ -1,14 +1,15 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, MapPin, Clock, Search, MessageSquare } from 'lucide-react';
-import { CHAPTERS, SAMPLE_DIALOGUE, SAMPLE_EVIDENCE } from '@/data/gameContent';
+import { ArrowLeft, MapPin, Search, MessageSquare } from 'lucide-react';
+import { CHAPTERS, SAMPLE_DIALOGUE, SAMPLE_EVIDENCE, SCENE_IMAGES } from '@/data/gameContent';
 import { useGameStore } from '@/stores/gameStore';
 import EvidenceCard from '@/components/game/EvidenceCard';
 import DialogueSystem from '@/components/game/DialogueSystem';
 import GameTimer from '@/components/game/GameTimer';
 import NarrativeSection from '@/components/game/NarrativeSection';
 import ChapterNav from '@/components/game/ChapterNav';
+import SceneExplorer from '@/components/game/SceneExplorer';
 
 const Chapter = () => {
   const navigate = useNavigate();
@@ -36,6 +37,8 @@ const Chapter = () => {
       </div>
     );
   }
+
+  const sceneImage = SCENE_IMAGES[current.locationKey];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -79,7 +82,7 @@ const Chapter = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -30 }}
               transition={{ duration: 0.5 }}
-              className="max-w-3xl mx-auto px-6 py-12"
+              className="max-w-4xl mx-auto px-6 py-12"
             >
               {/* Chapter header */}
               <div className="mb-10">
@@ -93,11 +96,26 @@ const Chapter = () => {
                 <div className="h-px bg-gradient-to-r from-primary/50 via-primary/20 to-transparent" />
               </div>
 
+              {/* Scene image with magnifier scanner */}
+              {sceneImage && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="mb-10"
+                >
+                  <SceneExplorer
+                    image={sceneImage}
+                    hotspots={current.hotspots || []}
+                    foundIds={foundEvidence}
+                    onEvidenceFound={handleEvidenceFound}
+                    locationName={current.location}
+                  />
+                </motion.div>
+              )}
+
               {/* Narrative */}
-              <NarrativeSection
-                text={current.description}
-                onEvidenceClick={() => handleEvidenceFound('ev_001')}
-              />
+              <NarrativeSection text={current.description} />
 
               {/* Dialogue trigger */}
               {(current.type === 'dialogue' || activeChapter === 0) && (
