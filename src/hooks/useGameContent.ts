@@ -81,7 +81,14 @@ async function loadGameData(): Promise<GameData> {
   if (cachedData) return cachedData;
   const base = import.meta.env.BASE_URL || '/';
   const res = await fetch(`${base}content/game-data.json`);
-  cachedData = await res.json();
+  const data: GameData = await res.json();
+  // Prefix scene image paths with base URL for correct loading on subpath deployments
+  const prefixed: Record<string, string> = {};
+  for (const [key, val] of Object.entries(data.sceneImages)) {
+    prefixed[key] = val.startsWith('/') ? `${base}${val.slice(1)}` : val;
+  }
+  data.sceneImages = prefixed;
+  cachedData = data;
   return cachedData!;
 }
 
