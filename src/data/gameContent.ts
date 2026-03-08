@@ -1,3 +1,9 @@
+import directorsOffice from '@/assets/scenes/directors-office.jpg';
+import hrDepartment from '@/assets/scenes/hr-department.jpg';
+import serverRoom from '@/assets/scenes/server-room.jpg';
+import meetingRoom from '@/assets/scenes/meeting-room.jpg';
+import boardroom from '@/assets/scenes/boardroom.jpg';
+
 export const MODULES = [
   {
     id: 'module_1',
@@ -31,46 +37,74 @@ export const MODULES = [
   },
 ];
 
+export const SCENE_IMAGES: Record<string, string> = {
+  'directors_office': directorsOffice,
+  'hr_department': hrDepartment,
+  'server_room': serverRoom,
+  'meeting_room': meetingRoom,
+  'boardroom': boardroom,
+};
+
 export const CHAPTERS = [
   {
     id: 'ch_1',
     moduleId: 'module_1',
     title: 'Точка входа',
     location: 'Кабинет директора',
+    locationKey: 'directors_office',
     type: 'narrative' as const,
     description: 'Утро понедельника. Вы получаете срочный вызов от генерального директора компании «НоваТех». Произошла утечка данных.',
+    hotspots: [
+      { id: 'hs_1', evidenceId: 'ev_001', x: 30, y: 55, radius: 40, label: 'Документы на столе', hint: 'Подозрительные документы' },
+      { id: 'hs_2', evidenceId: 'ev_003', x: 72, y: 40, radius: 35, label: 'Экран ноутбука', hint: 'Открытое письмо на экране' },
+    ],
   },
   {
     id: 'ch_2',
     moduleId: 'module_1',
     title: 'Люди в системе',
     location: 'Отдел кадров',
+    locationKey: 'hr_department',
     type: 'dialogue' as const,
     description: 'Вам нужно опросить ключевых сотрудников и выяснить, кто имел доступ к данным.',
+    hotspots: [
+      { id: 'hs_3', evidenceId: 'ev_003', x: 55, y: 50, radius: 35, label: 'Стикеры на мониторе', hint: 'Записки на мониторе' },
+    ],
   },
   {
     id: 'ch_3',
     moduleId: 'module_1',
     title: 'Цифровые следы',
     location: 'Серверная комната',
+    locationKey: 'server_room',
     type: 'evidence' as const,
     description: 'Изучите серверные логи и найдите аномалии в системе доступа.',
+    hotspots: [
+      { id: 'hs_4', evidenceId: 'ev_002', x: 80, y: 55, radius: 40, label: 'Монитор с логами', hint: 'Серверные логи на экране' },
+      { id: 'hs_5', evidenceId: 'ev_004', x: 85, y: 70, radius: 30, label: 'Стикер с паролями', hint: 'Что-то приклеено к монитору' },
+    ],
   },
   {
     id: 'ch_4',
     moduleId: 'module_1',
     title: 'Допрос',
     location: 'Переговорная',
+    locationKey: 'meeting_room',
     type: 'dialogue' as const,
     description: 'Время для решающего разговора с главным подозреваемым.',
+    hotspots: [
+      { id: 'hs_6', evidenceId: 'ev_002', x: 45, y: 65, radius: 35, label: 'Документы на столе', hint: 'Разбросанные бумаги' },
+    ],
   },
   {
     id: 'ch_5',
     moduleId: 'module_1',
     title: 'Финальное решение',
     location: 'Зал совещаний',
+    locationKey: 'boardroom',
     type: 'narrative' as const,
     description: 'Представьте результаты расследования и примите окончательное решение.',
+    hotspots: [],
   },
 ];
 
