@@ -3,7 +3,7 @@ import { create } from 'zustand';
 export interface Evidence {
   id: string;
   title: string;
-  type: 'document' | 'log' | 'email' | 'testimony' | 'file';
+  type: string;
   description: string;
   chapter: number;
   discoveredAt?: Date;
