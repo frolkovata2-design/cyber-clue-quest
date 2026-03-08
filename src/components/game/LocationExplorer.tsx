@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, MapPin, AlertTriangle, FileText, Terminal, Mail, File, Eye, ChevronRight, ArrowLeft } from 'lucide-react';
@@ -48,25 +48,6 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
   const totalEvidence = locations.reduce((sum, l) => sum + l.hotspots.length, 0);
   const uniqueFound = new Set(foundEvidence);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!sceneRef.current) return;
-    const rect = sceneRef.current.getBoundingClientRect();
-    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-
-    // Check proximity to any hotspot
-    const pctX = ((e.clientX - rect.left) / rect.width) * 100;
-    const pctY = ((e.clientY - rect.top) / rect.height) * 100;
-    let near = false;
-    for (const hs of loc.hotspots) {
-      if (foundEvidence.includes(hs.evidenceId)) continue;
-      const dx = pctX - hs.x;
-      const dy = pctY - hs.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 12) { near = true; break; }
-    }
-    setNearHotspot(near);
-  }, [loc.hotspots, foundEvidence]);
-
   const handleHotspotClick = (hotspot: LocationHotspot) => {
     if (foundEvidence.includes(hotspot.evidenceId)) return;
     SFX.hotspotClick();
@@ -74,10 +55,7 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
   };
 
   const handleHotspotHover = (id: string | null) => {
-    if (id && id !== prevHoveredRef.current) {
-      SFX.hotspotHover();
-    }
-    prevHoveredRef.current = id;
+    if (id) SFX.hotspotHover();
     setHoveredHotspot(id);
   };
 
@@ -95,6 +73,14 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
       <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-lg px-4 py-3">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate('/game')}
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Назад
+            </button>
+            <div className="w-px h-5 bg-border" />
             <MapPin className="w-4 h-4 text-primary" />
             <span className="text-sm font-medium text-foreground">{loc.name}</span>
           </div>
@@ -139,18 +125,11 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="text-center text-sm text-muted-foreground mb-4 font-mono"
           >
-            🔍 Води лупой по сцене — она покажет скрытые следы и аномалии
+            🔍 Нажимайте на мигающие точки, чтобы найти улики
           </motion.p>
 
-          {/* Scene image with magnifier */}
-          <div
-            ref={sceneRef}
-            className="relative rounded-xl overflow-hidden border border-border shadow-2xl"
-            style={{ cursor: isOverScene ? 'none' : 'default' }}
-            onMouseEnter={() => setIsOverScene(true)}
-            onMouseLeave={() => { setIsOverScene(false); setNearHotspot(false); }}
-            onMouseMove={handleMouseMove}
-          >
+          {/* Scene image */}
+          <div className="relative rounded-xl overflow-hidden border border-border shadow-2xl">
             <img src={sceneImage} alt={loc.name} className="w-full h-auto block" draggable={false} />
 
             {/* Hotspots */}
@@ -163,7 +142,7 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.5 }}
-                  className={`absolute z-10 ${isFound ? 'pointer-events-none' : 'cursor-none'}`}
+                  className={`absolute z-10 ${isFound ? 'pointer-events-none' : 'cursor-pointer'}`}
                   style={{ left: `${hotspot.x}%`, top: `${hotspot.y}%`, transform: 'translate(-50%, -50%)' }}
                   onMouseEnter={() => handleHotspotHover(hotspot.id)}
                   onMouseLeave={() => handleHotspotHover(null)}
@@ -201,81 +180,6 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
               );
             })}
 
-            {/* Magnifier lens following cursor */}
-            {isOverScene && (
-              <div
-                className="absolute z-20 pointer-events-none"
-                style={{ left: mousePos.x - 50, top: mousePos.y - 50, width: 100, height: 100 }}
-              >
-                <div
-                  className="w-full h-full rounded-full overflow-hidden border-2 relative"
-                  style={{
-                    borderColor: nearHotspot ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.3)',
-                    boxShadow: nearHotspot
-                      ? '0 0 25px hsl(var(--primary) / 0.5), inset 0 0 15px hsl(var(--primary) / 0.1)'
-                      : '0 0 15px hsl(var(--background) / 0.7)',
-                    transition: 'border-color 0.2s, box-shadow 0.2s',
-                  }}
-                >
-                  {/* Forensic trace view — shows "anomalies" */}
-                  <div
-                    className="absolute"
-                    style={{
-                      width: sceneRef.current?.offsetWidth ?? 800,
-                      height: sceneRef.current?.offsetHeight ?? 450,
-                      left: -(mousePos.x * 1.5 - 50),
-                      top: -(mousePos.y * 1.5 - 50),
-                      transform: 'scale(1.5)',
-                      transformOrigin: 'top left',
-                    }}
-                  >
-                    <img src={sceneImage} alt="" className="w-full h-full object-cover" style={{
-                      filter: nearHotspot
-                        ? 'brightness(1.6) contrast(1.8) saturate(0.3) hue-rotate(180deg)'
-                        : 'brightness(1.2) contrast(1.4) saturate(0.5) sepia(0.3)',
-                      transition: 'filter 0.3s',
-                    }} draggable={false} />
-                    {/* Hotspot glow markers visible only in magnifier */}
-                    {loc.hotspots.filter(h => !foundEvidence.includes(h.evidenceId)).map(h => (
-                      <div
-                        key={h.id}
-                        className="absolute rounded-full"
-                        style={{
-                          left: `${h.x}%`,
-                          top: `${h.y}%`,
-                          width: 24,
-                          height: 24,
-                          transform: 'translate(-50%, -50%)',
-                          background: 'radial-gradient(circle, hsl(var(--destructive) / 0.6) 0%, transparent 70%)',
-                          boxShadow: '0 0 12px hsl(var(--destructive) / 0.4)',
-                        }}
-                      />
-                    ))}
-                  </div>
-                  {/* Crosshair */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-px h-5 bg-primary/30 absolute" />
-                    <div className="h-px w-5 bg-primary/30 absolute" />
-                  </div>
-                  {/* Pulse when near */}
-                  {nearHotspot && (
-                    <motion.div
-                      className="absolute inset-0 rounded-full border-2 border-primary"
-                      animate={{ scale: [1, 1.15, 1], opacity: [0.7, 0.2, 0.7] }}
-                      transition={{ duration: 0.8, repeat: Infinity }}
-                    />
-                  )}
-                </div>
-                {/* Handle */}
-                <div className="absolute -bottom-3 -right-3 w-5 h-8 bg-muted-foreground/20 rounded-b-full"
-                  style={{ transform: 'rotate(45deg)', transformOrigin: 'top left' }}
-                />
-              </div>
-            )}
-
-
-
-
             {/* All found overlay */}
             {allLocationEvidenceFound && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -290,7 +194,14 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
           </div>
 
           {/* Navigation */}
-          <div className="mt-6 flex justify-end">
+          <div className="mt-6 flex justify-between">
+            <button
+              onClick={() => navigate('/game')}
+              className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              К модулям
+            </button>
             {activeLocation < locations.length - 1 ? (
               <button
                 onClick={() => { setActiveLocation(p => p + 1); SFX.transition(); }}
