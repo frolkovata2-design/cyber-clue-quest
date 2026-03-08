@@ -1,5 +1,5 @@
 # Cyber Clue Quest — Интерактивный квест по защите данных
-<!-- Deploy trigger: 2026-03-08T19:10 - 3 modules -->
+<!-- Deploy trigger: 2026-03-08T19:25 - locked locations, unique questions, expanded evidence -->
 
 ## Project info
 
