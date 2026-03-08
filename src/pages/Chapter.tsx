@@ -50,7 +50,7 @@ const Chapter = () => {
   }
 
   if (phase === 'comic') {
-    return <ComicStrip onComplete={() => setPhase('explore')} />;
+    return <ComicStrip moduleId={moduleId} onComplete={() => setPhase('explore')} />;
   }
 
   if (phase === 'explore') {
