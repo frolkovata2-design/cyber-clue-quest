@@ -1,4 +1,5 @@
 # Welcome to your Lovable project
+<!-- Deploy trigger: 2026-03-08 -->
 
 ## Project info
 
