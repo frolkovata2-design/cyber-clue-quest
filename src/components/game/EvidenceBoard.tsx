@@ -36,7 +36,9 @@ const EvidenceBoard = ({ foundEvidence, moduleId = 'module_1', onComplete }: Evi
   const [isCorrect, setIsCorrect] = useState(false);
 
   const match = moduleMatches[currentMatch];
-  const availableEvidence = foundEvidence.map(id => SAMPLE_EVIDENCE.find(e => e.id === id)).filter(Boolean);
+  const availableEvidence = Array.from(new Set(foundEvidence))
+    .map(id => SAMPLE_EVIDENCE.find(e => e.id === id))
+    .filter(Boolean);
 
   if (!match) {
     return (

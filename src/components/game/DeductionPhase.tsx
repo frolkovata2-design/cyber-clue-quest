@@ -202,6 +202,7 @@ const DeductionPhase = ({ foundEvidence, moduleId = 'module_1', onComplete }: De
 
   const correctCount = Object.values(answers).filter(a => a.correct).length;
   const score = Math.round((correctCount / questions.length) * 100);
+  const uniqueFoundEvidence = Array.from(new Set(foundEvidence));
 
   if (isComplete) {
     return (
@@ -238,7 +239,7 @@ const DeductionPhase = ({ foundEvidence, moduleId = 'module_1', onComplete }: De
               <p className="text-xs text-muted-foreground">Точность</p>
             </div>
             <div className="bg-secondary rounded-lg p-3">
-              <p className="text-2xl font-bold text-foreground">{foundEvidence.length}</p>
+              <p className="text-2xl font-bold text-foreground">{uniqueFoundEvidence.length}</p>
               <p className="text-xs text-muted-foreground">Улик</p>
             </div>
             <div className="bg-secondary rounded-lg p-3">
@@ -394,7 +395,7 @@ const DeductionPhase = ({ foundEvidence, moduleId = 'module_1', onComplete }: De
         <div className="max-w-3xl mx-auto">
           <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-2">Ваши улики</p>
           <div className="flex gap-2 overflow-x-auto">
-            {foundEvidence.map(evId => {
+            {uniqueFoundEvidence.map(evId => {
               const ev = SAMPLE_EVIDENCE.find(e => e.id === evId);
               if (!ev) return null;
               const Icon = typeIcons[ev.type] || FileText;

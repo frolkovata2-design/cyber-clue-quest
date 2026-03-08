@@ -47,6 +47,7 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
   const sceneImage = SCENE_IMAGES[loc.locationKey];
   const totalEvidence = locations.reduce((sum, l) => sum + l.hotspots.length, 0);
   const uniqueFound = new Set(foundEvidence);
+  const uniqueFoundEvidence = Array.from(uniqueFound);
 
   const handleHotspotClick = (hotspot: LocationHotspot) => {
     if (foundEvidence.includes(hotspot.evidenceId)) return;
@@ -266,14 +267,14 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
         </div>
 
         {/* Bottom evidence bar */}
-        {foundEvidence.length > 0 && (
+        {uniqueFoundEvidence.length > 0 && (
           <div className="border-t border-border bg-card/80 backdrop-blur-sm px-4 py-4">
             <div className="max-w-5xl mx-auto">
               <p className="text-xs font-mono text-primary uppercase tracking-wider mb-3">
-                Собранные улики ({foundEvidence.length})
+                Собранные улики ({uniqueFoundEvidence.length})
               </p>
               <div className="flex gap-3 overflow-x-auto pb-2">
-                {foundEvidence.map((evId) => {
+                {uniqueFoundEvidence.map((evId) => {
                   const ev = SAMPLE_EVIDENCE.find(e => e.id === evId);
                   if (!ev) return null;
                   const Icon = typeIcons[ev.type] || FileText;

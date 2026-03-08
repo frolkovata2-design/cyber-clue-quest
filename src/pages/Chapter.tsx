@@ -20,11 +20,18 @@ const Chapter = () => {
   const chapters = CHAPTERS.filter((c) => c.moduleId === moduleId);
 
   const handleEvidenceFound = (evId: string) => {
-    if (!foundEvidence.includes(evId)) {
-      setFoundEvidence((prev) => [...prev, evId]);
-      const ev = SAMPLE_EVIDENCE.find((e) => e.id === evId);
-      if (ev) addEvidence(ev);
-    }
+    let isNewEvidence = false;
+
+    setFoundEvidence((prev) => {
+      if (prev.includes(evId)) return prev;
+      isNewEvidence = true;
+      return [...prev, evId];
+    });
+
+    if (!isNewEvidence) return;
+
+    const ev = SAMPLE_EVIDENCE.find((e) => e.id === evId);
+    if (ev) addEvidence(ev);
   };
 
   const handleDeductionComplete = (score: number) => {
