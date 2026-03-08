@@ -238,7 +238,7 @@ const DeductionPhase = ({ foundEvidence, moduleId = 'module_1', onComplete }: De
               <p className="text-xs text-muted-foreground">Точность</p>
             </div>
             <div className="bg-secondary rounded-lg p-3">
-              <p className="text-2xl font-bold text-foreground">{foundEvidence.length}</p>
+              <p className="text-2xl font-bold text-foreground">{Array.from(new Set(foundEvidence)).length}</p>
               <p className="text-xs text-muted-foreground">Улик</p>
             </div>
             <div className="bg-secondary rounded-lg p-3">

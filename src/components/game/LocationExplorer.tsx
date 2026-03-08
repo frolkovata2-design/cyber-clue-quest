@@ -47,6 +47,7 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
   const sceneImage = SCENE_IMAGES[loc.locationKey];
   const totalEvidence = locations.reduce((sum, l) => sum + l.hotspots.length, 0);
   const uniqueFound = new Set(foundEvidence);
+  const uniqueFoundEvidence = Array.from(uniqueFound);
 
   const handleHotspotClick = (hotspot: LocationHotspot) => {
     if (foundEvidence.includes(hotspot.evidenceId)) return;
