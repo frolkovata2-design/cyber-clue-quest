@@ -167,9 +167,9 @@ export const SAMPLE_DIALOGUE = [
 export const SAMPLE_EVIDENCE = [
   {
     id: 'ev_001',
-    title: 'Нарушение сроков уведомления',
+    title: 'Незнание порядка уведомления',
     type: 'document' as const,
-    description: 'Директор не знал о необходимости уведомить Роскомнадзор в течение 24 часов (не 72). Нарушение ст.21 152-ФЗ.',
+    description: 'Директор не знал, что об утечке персональных данных необходимо уведомить Роскомнадзор в течение 24 часов (он думал — 72). Также компания обязана уведомить субъектов ПД, чьи данные были скомпрометированы.',
     chapter: 1,
     connections: ['ev_003'],
     violationRef: 'Ст. 21 152-ФЗ',
@@ -266,30 +266,6 @@ export const SAMPLE_EVIDENCE = [
     isSecret: false,
   },
 ];
-
-// Easter eggs - fun hidden discoveries in each scene
-export const EASTER_EGGS: Record<string, Array<{ id: string; x: number; y: number; emoji: string; text: string }>> = {
-  directors_office: [
-    { id: 'ee_1', x: 15, y: 25, emoji: '🐱', text: 'Под столом спит офисный кот Баг!' },
-    { id: 'ee_2', x: 85, y: 70, emoji: '🎮', text: 'Директор прячет геймпад в ящике…' },
-  ],
-  hr_department: [
-    { id: 'ee_3', x: 80, y: 30, emoji: '🌵', text: 'Кактус с именем «Роскомнадзор»' },
-    { id: 'ee_4', x: 10, y: 75, emoji: '☕', text: 'Кружка «Я ♥ 152-ФЗ» — мечта HR-а' },
-  ],
-  server_room: [
-    { id: 'ee_5', x: 35, y: 25, emoji: '🕷️', text: 'Паутина на старом сервере… буквально web-сервер' },
-    { id: 'ee_6', x: 60, y: 80, emoji: '🍕', text: 'Коробка от пиццы. Кто-то тут ночевал…' },
-  ],
-  meeting_room: [
-    { id: 'ee_7', x: 75, y: 20, emoji: '📌', text: 'На доске: «P@ssw0rd — НЕ ИСПОЛЬЗОВАТЬ!!!»' },
-    { id: 'ee_8', x: 15, y: 40, emoji: '🧸', text: 'Чей-то плюшевый антистресс-медведь' },
-  ],
-  boardroom: [
-    { id: 'ee_9', x: 70, y: 35, emoji: '🖼️', text: 'На картине: «Мы не храним куки... или храним?»' },
-    { id: 'ee_10', x: 20, y: 80, emoji: '📎', text: 'Скрепыш: «Похоже, вам нужна помощь с ПД!»' },
-  ],
-};
 
 // Evidence matching data: pair evidence to conclusions
 export const EVIDENCE_MATCHES = [
