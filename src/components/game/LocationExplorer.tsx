@@ -276,24 +276,8 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
               </div>
             )}
 
-            {/* Easter egg popup */}
-            <AnimatePresence>
-              {activeEasterEgg && isOverScene && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  className="absolute z-30 pointer-events-none"
-                  style={{ left: `${activeEasterEgg.x}%`, top: `${activeEasterEgg.y}%`, transform: 'translate(-50%, -130%)' }}
-                >
-                  <div className="px-4 py-2.5 rounded-xl bg-card/95 backdrop-blur-sm border border-accent/50 shadow-2xl max-w-[220px]">
-                    <p className="text-lg leading-none mb-1">{activeEasterEgg.emoji}</p>
-                    <p className="text-xs text-foreground font-medium">{activeEasterEgg.text}</p>
-                    <p className="text-[10px] text-muted-foreground mt-1">🥚 Пасхалка!</p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+
+
 
             {/* All found overlay */}
             {allLocationEvidenceFound && (
