@@ -1,6 +1,7 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, AlertTriangle, FileText, Terminal, Mail, File, Eye, ChevronRight } from 'lucide-react';
+import { Search, MapPin, AlertTriangle, FileText, Terminal, Mail, File, Eye, ChevronRight, ArrowLeft } from 'lucide-react';
 import { SAMPLE_EVIDENCE, SCENE_IMAGES } from '@/data/gameContent';
 import { SFX } from '@/lib/sfx';
 
@@ -37,14 +38,10 @@ const typeIcons: Record<string, any> = {
 };
 
 const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplete }: LocationExplorerProps) => {
+  const navigate = useNavigate();
   const [activeLocation, setActiveLocation] = useState(0);
   const [hoveredHotspot, setHoveredHotspot] = useState<string | null>(null);
   const [selectedEvidence, setSelectedEvidence] = useState<string | null>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [isOverScene, setIsOverScene] = useState(false);
-  const [nearHotspot, setNearHotspot] = useState(false);
-  const sceneRef = useRef<HTMLDivElement>(null);
-  const prevHoveredRef = useRef<string | null>(null);
 
   const loc = locations[activeLocation];
   const sceneImage = SCENE_IMAGES[loc.locationKey];
