@@ -1,5 +1,5 @@
-# Welcome to your Lovable project
-<!-- Deploy trigger: 2026-03-08 -->
+# Cyber Clue Quest — Интерактивный квест по защите данных
+<!-- Deploy trigger: 2026-03-08T19:10 - 3 modules -->
 
 ## Project info
 
