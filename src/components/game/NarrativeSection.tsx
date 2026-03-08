@@ -1,10 +1,7 @@
-import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Search } from 'lucide-react';
 
 interface NarrativeSectionProps {
   text: string;
-  onEvidenceClick: () => void;
 }
 
 const NARRATIVE_PARAGRAPHS = [
@@ -15,7 +12,7 @@ const NARRATIVE_PARAGRAPHS = [
   '«Данные 50 000 клиентов оказались в открытом доступе,» — без предисловий начинает Петров. — «Мы обнаружили это сегодня утром. Нам нужна ваша помощь.»',
 ];
 
-const NarrativeSection = ({ text, onEvidenceClick }: NarrativeSectionProps) => {
+const NarrativeSection = ({ text }: NarrativeSectionProps) => {
   return (
     <div className="space-y-6">
       {NARRATIVE_PARAGRAPHS.map((paragraph, i) => (
@@ -29,27 +26,6 @@ const NarrativeSection = ({ text, onEvidenceClick }: NarrativeSectionProps) => {
           {paragraph}
         </motion.p>
       ))}
-
-      {/* Interactive evidence hint */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: NARRATIVE_PARAGRAPHS.length * 0.3 + 0.5 }}
-        onClick={onEvidenceClick}
-        className="mt-8 p-4 rounded-lg border border-dashed border-primary/30 bg-primary/5 cursor-pointer hover:border-primary/60 hover:bg-primary/10 transition-all group"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center animate-glow-pulse">
-            <Search className="w-5 h-5 text-primary" />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
-              Осмотреть документы на столе
-            </p>
-            <p className="text-xs text-muted-foreground">Нажмите, чтобы исследовать улику</p>
-          </div>
-        </div>
-      </motion.div>
     </div>
   );
 };
