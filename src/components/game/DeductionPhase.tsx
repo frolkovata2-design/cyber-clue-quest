@@ -80,6 +80,7 @@ const DeductionPhase = ({ foundEvidence, onComplete }: DeductionPhaseProps) => {
       [question.id]: { selected: optionId, correct: option.correct },
     }));
     setShowExplanation(true);
+    if (option.correct) SFX.correct(); else SFX.wrong();
   };
 
   const handleNext = () => {
