@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle, AlertTriangle, FileText, Terminal, Mail, File, Eye, Scale } from 'lucide-react';
 import { SAMPLE_EVIDENCE } from '@/data/gameContent';
+import { SFX } from '@/lib/sfx';
 
 interface DeductionPhaseProps {
   foundEvidence: string[];
