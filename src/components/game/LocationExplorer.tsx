@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, AlertTriangle, FileText, Terminal, Mail, File, Eye, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Search, MapPin, AlertTriangle, FileText, Terminal, Mail, File, Eye, ChevronRight, ArrowLeft, Lock } from 'lucide-react';
 import { SAMPLE_EVIDENCE, SCENE_IMAGES } from '@/data/gameContent';
 import { SFX } from '@/lib/sfx';
 
@@ -65,7 +65,22 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
     setTimeout(() => onEvidenceFound(evidenceId), 200);
   };
 
-  const allLocationEvidenceFound = loc.hotspots.every(h => foundEvidence.includes(h.evidenceId));
+  const isLocationComplete = (locIndex: number) =>
+    locations[locIndex].hotspots.every(h => foundEvidence.includes(h.evidenceId));
+
+  const isLocationUnlocked = (locIndex: number) => {
+    if (locIndex === 0) return true;
+    return isLocationComplete(locIndex - 1);
+  };
+
+  const allLocationEvidenceFound = isLocationComplete(activeLocation);
+  const allEvidenceCollected = locations.every((_, i) => isLocationComplete(i));
+
+  const handleLocationSwitch = (index: number) => {
+    if (!isLocationUnlocked(index)) return;
+    setActiveLocation(index);
+    SFX.transition();
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -95,24 +110,32 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
       <div className="border-b border-border bg-card/50">
         <div className="max-w-5xl mx-auto flex overflow-x-auto">
           {locations.map((l, i) => {
-            const locDone = l.hotspots.every(h => foundEvidence.includes(h.evidenceId));
+            const locDone = isLocationComplete(i);
+            const unlocked = isLocationUnlocked(i);
             const hasAny = l.hotspots.some(h => foundEvidence.includes(h.evidenceId));
             return (
               <button
                 key={l.id}
-                onClick={() => { setActiveLocation(i); SFX.transition(); }}
+                onClick={() => handleLocationSwitch(i)}
+                disabled={!unlocked}
                 className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                  i === activeLocation
+                  !unlocked
+                    ? 'border-transparent text-muted-foreground/30 cursor-not-allowed'
+                    : i === activeLocation
                     ? 'border-primary text-primary'
                     : locDone
                     ? 'border-transparent text-muted-foreground/60'
                     : 'border-transparent text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <MapPin className="w-3 h-3" />
+                {!unlocked ? (
+                  <Lock className="w-3 h-3" />
+                ) : (
+                  <MapPin className="w-3 h-3" />
+                )}
                 {l.name}
                 {locDone && <span className="text-xs text-primary">✓</span>}
-                {!locDone && hasAny && <span className="w-2 h-2 rounded-full bg-primary/50" />}
+                {!locDone && hasAny && unlocked && <span className="w-2 h-2 rounded-full bg-primary/50" />}
               </button>
             );
           })}
@@ -125,7 +148,11 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="text-center text-sm text-muted-foreground mb-4 font-mono"
           >
-            🔍 Нажимайте на мигающие точки, чтобы найти улики
+            {allLocationEvidenceFound && activeLocation < locations.length - 1
+              ? '✅ Все улики в этой локации найдены! Переходите к следующей.'
+              : allLocationEvidenceFound
+              ? '✅ Все улики найдены! Можете перейти к сопоставлению.'
+              : '🔍 Найдите все улики в этой локации, чтобы продвинуться дальше'}
           </motion.p>
 
           {/* Scene image */}
@@ -187,7 +214,11 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
               >
                 <div className="bg-card/90 backdrop-blur-sm border border-primary/30 rounded-xl px-6 py-4 text-center shadow-2xl">
                   <p className="text-primary font-bold">✓ Все улики найдены</p>
-                  <p className="text-xs text-muted-foreground mt-1">Переходите к следующей локации</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {activeLocation < locations.length - 1
+                      ? 'Переходите к следующей локации'
+                      : 'Переходите к сопоставлению улик'}
+                  </p>
                 </div>
               </motion.div>
             )}
@@ -204,13 +235,25 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
             </button>
             {activeLocation < locations.length - 1 ? (
               <button
-                onClick={() => { setActiveLocation(p => p + 1); SFX.transition(); }}
-                className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium bg-secondary text-foreground rounded-lg hover:bg-secondary/80 transition-colors"
+                onClick={() => { handleLocationSwitch(activeLocation + 1); }}
+                disabled={!allLocationEvidenceFound}
+                className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-lg transition-all ${
+                  allLocationEvidenceFound
+                    ? 'bg-primary text-primary-foreground hover:scale-105 active:scale-95 shadow-lg shadow-primary/20'
+                    : 'bg-secondary text-muted-foreground cursor-not-allowed opacity-50'
+                }`}
               >
-                Следующая локация <ChevronRight className="w-4 h-4" />
+                {allLocationEvidenceFound ? (
+                  <>Следующая локация <ChevronRight className="w-4 h-4" /></>
+                ) : (
+                  <>
+                    <Lock className="w-4 h-4" />
+                    Найдите все улики ({loc.hotspots.filter(h => foundEvidence.includes(h.evidenceId)).length}/{loc.hotspots.length})
+                  </>
+                )}
               </button>
             ) : (
-              uniqueFound.size > 0 && (
+              allEvidenceCollected && (
                 <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                   onClick={() => { SFX.complete(); onComplete(); }}
                   className="px-6 py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:scale-105 active:scale-95 transition-transform shadow-lg shadow-primary/20"

@@ -68,6 +68,7 @@ const Chapter = () => {
     return (
       <EvidenceBoard
         foundEvidence={foundEvidence}
+        moduleId={moduleId}
         onComplete={() => setPhase('deduction')}
       />
     );
@@ -76,6 +77,7 @@ const Chapter = () => {
   return (
     <DeductionPhase
       foundEvidence={foundEvidence}
+      moduleId={moduleId}
       onComplete={handleDeductionComplete}
     />
   );
