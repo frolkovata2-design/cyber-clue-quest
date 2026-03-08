@@ -125,9 +125,17 @@ const LocationExplorer = ({ locations, foundEvidence, onEvidenceFound, onComplet
             <MapPin className="w-4 h-4 text-primary" />
             <span className="text-sm font-medium text-foreground">{loc.name}</span>
           </div>
-          <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground bg-secondary px-3 py-1.5 rounded-md">
-            <Search className="w-3 h-3 text-primary" />
-            <span>{uniqueFound.size}/{totalEvidence} улик</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground bg-secondary px-3 py-1.5 rounded-md">
+              <Search className="w-3 h-3 text-primary" />
+              <span>{uniqueFound.size}/{totalEvidence} улик</span>
+            </div>
+            {foundEasterEggs.length > 0 && (
+              <div className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground bg-accent/20 px-3 py-1.5 rounded-md">
+                <span>🥚</span>
+                <span>{foundEasterEggs.length} пасхал{foundEasterEggs.length === 1 ? 'ка' : foundEasterEggs.length < 5 ? 'ки' : 'ок'}</span>
+              </div>
+            )}
           </div>
         </div>
       </header>
